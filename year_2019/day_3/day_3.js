@@ -30,27 +30,16 @@ const doesLinesIntersect = (firstWire, secondWire) => {
 
 const extractCoordinates = (path) => {
   let [x, y] = [0, 0];
+  const directions = {
+    R: (x, y, location) => [x + location, y],
+    L: (x, y, location) => [x - location, y],
+    U: (x, y, location) => [x, y + location],
+    D: (x, y, location) => [x, y - location],
+  };
   return path.split(",").map((coord) => {
     const location = Number(coord.slice(1));
-    if (coord.startsWith("R")) {
-      x = x + location;
-      return { x: x, y: y };
-    }
-
-    if (coord.startsWith("L")) {
-      x = x - location;
-      return { x: x, y: y };
-    }
-
-    if (coord.startsWith("U")) {
-      y = y + location;
-      return { x: x, y: y };
-    }
-
-    if (coord.startsWith("D")) {
-      y = y - location;
-      return { x: x, y: y };
-    }
+    [x, y] = directions[coord[0]](x, y, location);
+    return { x: x, y: y };
   });
 };
 
