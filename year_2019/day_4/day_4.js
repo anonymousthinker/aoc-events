@@ -16,15 +16,34 @@
 
 // Your puzzle input is 124075-580769.
 
-const adjacentEqual = (number) => {
-  const input = number.toString().split("");
-  for (let index = 0; index < input.length; index += 1) {
-    if (Number(input[index]) === Number(input[index + 1])) {
-      return true;
-    }
-  }
+// --- Part Two ---
+// An Elf just remembered one more important detail: the two adjacent matching digits are not part of a larger group of matching digits.
 
-  return false;
+// Given this additional criterion, but still ignoring the range rule, the following are now true:
+
+// 112233 meets these criteria because the digits never decrease and all repeated digits are exactly two digits long.
+// 123444 no longer meets the criteria (the repeated 44 is part of a larger group of 444).
+// 111122 meets the criteria (even though 1 is repeated more than twice, it still contains a double 22).
+// How many different passwords within the range given in your puzzle input meet all of the criteria?
+
+//I have to check if the sum of repeated digits is less than or equal to the sum of the remaining digits, and this will be done for tall the repeating digits
+
+const extractRepeating = (number) => {
+  const input = number.toString().split("");
+  const occurencesOfEach = Object.entries(
+    input.reduce((record, char) => {
+      record[char] = record[char] || 0;
+      record[char] += 1;
+      return record;
+    }, {})
+  );
+  const max = Math.max(...occurencesOfEach.map(([_, count]) => count));
+  const [char, count] = occurencesOfEach.find(([_, count]) => count === max);
+  const remaining = occurencesOfEach.filter(
+    ([curr, times]) => times <= max && curr !== char
+  );
+  const secondMax = Math.max(...remaining.map(([_, count]) => count));
+  return max === 2 || (max > 2 && secondMax === 2);
 };
 
 const neverDecrease = (number) => {
@@ -48,7 +67,7 @@ const main = () => {
   );
 
   for (const number of numbersInRange) {
-    if (adjacentEqual(number) && neverDecrease(number)) {
+    if (extractRepeating(number) && neverDecrease(number)) {
       noOfPasswords += 1;
     }
   }
