@@ -5,27 +5,40 @@ const lieInBetween = (point, rear1, rear2) => {
   return min <= point && max >= point;
 };
 
-const doesLinesIntersect = (firstWire, secondWire) => {
-  const intersections = [];
-  for (let i = 0; i < firstWire.length - 1; i += 1) {
-    for (let j = 0; j < secondWire.length - 1; j += 1) {
+const countSteps = (fw, sw) => {
+  const steps = [];
+  let fws = Math.abs(0 - fw[0].x) + Math.abs(0 - fw[0].y);
+  for (let i = 0; i < fw.length - 1; i += 1) {
+    let sws = Math.abs(0 - sw[0].x) + Math.abs(0 - sw[0].y);
+    for (let j = 0; j < sw.length - 1; j += 1) {
       if (
-        lieInBetween(secondWire[j].x, firstWire[i].x, firstWire[i + 1].x) &&
-        lieInBetween(firstWire[i].y, secondWire[j].y, secondWire[j + 1].y)
+        lieInBetween(sw[j].x, fw[i].x, fw[i + 1].x) &&
+        lieInBetween(fw[i].y, sw[j].y, sw[j + 1].y)
       ) {
-        intersections.push([secondWire[j].x, firstWire[i].y]);
+        fws += Math.abs(fw[i].y - sw[j].y);
+        sws += Math.abs(fw[i].x - sw[j].x);
+        steps.push([fws, sws]);
+        fws -= Math.abs(fw[i].y - sw[j].y);
+        sws -= Math.abs(fw[i].x - sw[j].x);
       }
 
       if (
-        lieInBetween(firstWire[i].x, secondWire[j].x, secondWire[j + 1].x) &&
-        lieInBetween(secondWire[j].y, firstWire[i].y, firstWire[i + 1].y)
+        lieInBetween(fw[i].x, sw[j].x, sw[j + 1].x) &&
+        lieInBetween(sw[j].y, fw[i].y, fw[i + 1].y)
       ) {
-        intersections.push([firstWire[i].x, secondWire[j].y]);
+        fws += Math.abs(fw[i].y - sw[j].y);
+        sws += Math.abs(fw[i].x - sw[j].x);
+        steps.push([fws, sws]);
+        fws -= Math.abs(fw[i].y - sw[j].y);
+        sws -= Math.abs(fw[i].x - sw[j].x);
       }
+      sws += Math.abs(sw[j].x - sw[j + 1].x) + Math.abs(sw[j].y - sw[j + 1].y);
     }
+    sws = 0;
+    fws += Math.abs(fw[i].x - fw[i + 1].x) + Math.abs(fw[i].y - fw[i + 1].y);
   }
 
-  return intersections;
+  return steps;
 };
 
 const extractCoordinates = (path) => {
@@ -46,8 +59,7 @@ const extractCoordinates = (path) => {
 const main = () => {
   const data = Deno.readTextFileSync("puzzleInput.txt").split("\n");
   const [firstWire, secondWire] = data.map((path) => extractCoordinates(path));
-
-  const allSums = doesLinesIntersect(firstWire, secondWire).map(
+  const allSums = countSteps(firstWire, secondWire).map(
     ([x, y]) => Math.abs(x) + Math.abs(y)
   );
   const min = Math.min(...allSums);
