@@ -1,19 +1,95 @@
 // Opcode 3 takes a single integer as input and saves it to the position given by its only parameter. For example, the instruction 3,50 would take an input value and store it at address 50.
 // Opcode 4 outputs the value of its only parameter. For example, the instruction 4,50 would output the value at address 50.
 
-const handle3 = (data, curr) => {
-  data[data[curr + 1]] = prompt("Enter input: ");
-  return 2;
+const handle8 = (data, mode1, mode2, curr) => {
+  if (mode1 === 0 && mode2 === 0) {
+    data[data[curr + 3]] =
+      Number(data[data[curr + 1]]) === Number(data[data[curr + 2]]) ? 1 : 0;
+  }
+  if (mode1 === 0 && mode2 === 1) {
+    data[data[curr + 3]] =
+      Number(data[data[curr + 1]]) === Number(data[curr + 2]) ? 1 : 0;
+  }
+  if (mode1 === 1 && mode2 === 0) {
+    data[data[curr + 3]] =
+      Number(data[curr + 1]) === Number(data[data[curr + 2]]) ? 1 : 0;
+  }
+  if (mode1 === 1 && mode2 === 1) {
+    data[data[curr + 3]] =
+      Number(data[curr + 1]) === Number(data[curr + 2]) ? 1 : 0;
+  }
+
+  return curr + 4;
+};
+
+const handle7 = (data, mode1, mode2, curr) => {
+  if (mode1 === 0 && mode2 === 0) {
+    data[data[curr + 3]] =
+      Number(data[data[curr + 1]]) < Number(data[data[curr + 2]]) ? 1 : 0;
+  }
+  if (mode1 === 0 && mode2 === 1) {
+    data[data[curr + 3]] =
+      Number(data[data[curr + 1]]) < Number(data[curr + 2]) ? 1 : 0;
+  }
+  if (mode1 === 1 && mode2 === 0) {
+    data[data[curr + 3]] =
+      Number(data[curr + 1]) < Number(data[data[curr + 2]]) ? 1 : 0;
+  }
+  if (mode1 === 1 && mode2 === 1) {
+    data[data[curr + 3]] =
+      Number(data[curr + 1]) < Number(data[curr + 2]) ? 1 : 0;
+  }
+
+  return curr + 4;
+};
+
+const handle6 = (data, mode1, mode2, curr) => {
+  if (mode1 === 0 && mode2 === 0) {
+    return Number(data[data[curr + 1]]) === 0
+      ? +data[data[curr + 2]]
+      : curr + 3;
+  }
+  if (mode1 === 0 && mode2 === 1) {
+    return Number(data[data[curr + 1]]) === 0 ? +data[curr + 2] : curr + 3;
+  }
+  if (mode1 === 1 && mode2 === 0) {
+    return Number(data[curr + 1]) === 0 ? +data[data[curr + 2]] : curr + 3;
+  }
+  if (mode1 === 1 && mode2 === 1) {
+    return Number(data[curr + 1]) === 0 ? +data[curr + 2] : curr + 3;
+  }
+};
+
+const handle5 = (data, mode1, mode2, curr) => {
+  if (mode1 === 0 && mode2 === 0) {
+    return Number(data[data[curr + 1]]) !== 0
+      ? +data[data[curr + 2]]
+      : curr + 3;
+  }
+  if (mode1 === 0 && mode2 === 1) {
+    return Number(data[data[curr + 1]]) !== 0 ? +data[curr + 2] : curr + 3;
+  }
+  if (mode1 === 1 && mode2 === 0) {
+    return Number(data[curr + 1]) !== 0 ? +data[data[curr + 2]] : curr + 3;
+  }
+  if (mode1 === 1 && mode2 === 1) {
+    return Number(data[curr + 1]) !== 0 ? +data[curr + 2] : curr + 3;
+  }
 };
 
 const handle4 = (data, mode1, curr) => {
   if (mode1 === 1) {
     console.log(data[curr + 1]);
-    return 2;
+    return curr + 2;
   }
 
   console.log(data[data[curr + 1]]);
-  return 2;
+  return curr + 2;
+};
+
+const handle3 = (data, curr) => {
+  data[data[curr + 1]] = prompt("Enter input: ");
+  return curr + 2;
 };
 
 const handle2 = (data, mode1, mode2, curr) => {
@@ -33,7 +109,7 @@ const handle2 = (data, mode1, mode2, curr) => {
     data[data[curr + 3]] = Number(data[curr + 1]) * Number(data[curr + 2]);
   }
 
-  return 4;
+  return curr + 4;
 };
 
 const handle1 = (data, mode1, mode2, curr) => {
@@ -53,7 +129,7 @@ const handle1 = (data, mode1, mode2, curr) => {
     data[data[curr + 3]] = Number(data[curr + 1]) + Number(data[curr + 2]);
   }
 
-  return 4;
+  return curr + 4;
 };
 
 const traverse = (data, paraOneMode, paraTwoMode, opcode, curr) => {
@@ -69,6 +145,14 @@ const traverse = (data, paraOneMode, paraTwoMode, opcode, curr) => {
       return handle3(data, +curr);
     case 4:
       return handle4(data, mode1, +curr);
+    case 5:
+      return handle5(data, mode1, mode2, +curr);
+    case 6:
+      return handle6(data, mode1, mode2, +curr);
+    case 7:
+      return handle7(data, mode1, mode2, +curr);
+    case 8:
+      return handle8(data, mode1, mode2, +curr);
   }
 };
 
@@ -85,7 +169,7 @@ const main = () => {
   let pointer = 0;
   while (data[pointer] !== "99") {
     const [paraTwoMode, paraOneMode, opcode] = parseInstruction(data[pointer]);
-    pointer += traverse(data, paraOneMode, paraTwoMode, opcode, pointer);
+    pointer = traverse(data, paraOneMode, paraTwoMode, opcode, pointer);
   }
 
   return data;
