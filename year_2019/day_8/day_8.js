@@ -1,3 +1,20 @@
+const extractColoredPixel = (layers) => {
+  const picture = [];
+  for (let i = 0; i < layers[0].length; i++) {
+    let innerInd = 0;
+    while (innerInd < layers.length) {
+      if (layers[innerInd][i] !== "2") {
+        break;
+      }
+      innerInd += 1;
+    }
+
+    picture.push(layers[innerInd][i]);
+  }
+
+  return picture;
+};
+
 const leastZeroesIn = (noOfZeroes) => {
   return noOfZeroes.reduce(
     (least, curr) => {
@@ -25,11 +42,11 @@ const main = () => {
     { length: Math.ceil(data.length / layerSize) },
     (_, i) => data.slice(i * layerSize, (i + 1) * layerSize)
   );
-
-  const noOfZeroes = layers.map((layer) => [layer, noOfCharIn(layer, "0")]);
-  const leastZeroes = leastZeroesIn(noOfZeroes);
-
-  return noOfCharIn(leastZeroes[0], "1") * noOfCharIn(leastZeroes[0], "2");
+  const workWith = extractColoredPixel(layers);
+  const message = Array.from({ length: tall }, (_, i) =>
+    workWith.slice(i * wide, (i + 1) * wide)
+  );
+  return message.map((x) => x.join("")).join("\n");
 };
 
 console.log(main());
