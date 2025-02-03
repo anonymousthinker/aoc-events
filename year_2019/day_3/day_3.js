@@ -62,6 +62,7 @@ const main = () => {
   const allSums = countSteps(firstWire, secondWire).map(
     ([x, y]) => Math.abs(x) + Math.abs(y)
   );
+  console.log(firstWire, secondWire);
   const min = Math.min(...allSums);
   return min;
 };

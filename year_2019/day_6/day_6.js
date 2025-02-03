@@ -1,16 +1,33 @@
 //so what I am gonna do is I will keep a record of every key and the no of orbits they have, lets say starting from the first, b has 1 direct,then whoever encounters b later will have 1 + b; like this total!
 
-const calculateTotalOrbits = (outerToInners, subbedData) => {
-  const x = Object.keys(outerToInners);
-  return x.map((key) => {
-    let ref = key;
-    let count = 1;
-    while (outerToInners[ref] !== "COM") {
-      ref = outerToInners[ref];
-      count += 1;
+const getCommonPath = (youPath, sanPath) => {
+  for (let index = 0; index < youPath.length; index += 1) {
+    if (sanPath.includes(youPath[index])) {
+      return youPath[index];
     }
-    return count;
-  });
+  }
+  return;
+};
+
+const calculatePath = (ref, outerToInners) => {
+  let key = ref;
+  const planets = [outerToInners[key]];
+  while (outerToInners[key] !== "COM") {
+    key = outerToInners[key];
+    planets.push(outerToInners[key]);
+  }
+  return planets;
+};
+
+const calculateTotalOrbits = (outerToInners) => {
+  const x = Object.keys(outerToInners);
+  const youPath = calculatePath("YOU", outerToInners);
+  const sanPath = calculatePath("SAN", outerToInners);
+
+  const commonPlanet = getCommonPath(youPath, sanPath);
+  const commonPath = calculatePath(commonPlanet, outerToInners);
+
+  return youPath.length + sanPath.length - commonPath.length * 2 - 2;
 };
 
 const whoRevolvesWhom = (subbedData) => {
@@ -23,16 +40,13 @@ const whoRevolvesWhom = (subbedData) => {
     return record;
   }, {});
 
-  return calculateTotalOrbits(outerToInners, subbedData);
+  return calculateTotalOrbits(outerToInners);
 };
 
 const main = () => {
   const data = Deno.readTextFileSync("puzzle_input.txt").split("\n");
   const subbedData = data.map((orbitDetails) => orbitDetails.split(")"));
-  return whoRevolvesWhom(subbedData).reduce(
-    (sum, currOrbit) => sum + currOrbit,
-    0
-  );
+  return whoRevolvesWhom(subbedData);
 };
 
 console.log(main());
